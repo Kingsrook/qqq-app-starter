@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ QQQ - Low-code Application Framework for Engineers.
+  ~ Copyright (C) 2021-2022.  Kingsrook, LLC
+  ~ 651 N Broad St Ste 205 # 6917 | Middletown DE 19709 | United States
+  ~ contact@kingsrook.com
+  ~ https://github.com/Kingsrook/
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>com.kingsrook</groupId>
+   <artifactId>qqq-app-starter</artifactId>
+   <version>0.1-SNAPSHOT</version>
+
+   <properties>
+      <!-- props specifically to this module -->
+      <!-- Try `mvn generate-sources -Dfrontend.phase=generate-sources' to only do the frontend packaging -->
+      <frontend.phase>prepare-package</frontend.phase>
+
+      <!-- Common props for all qqq modules -->
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+      <maven.compiler.source>17</maven.compiler.source>
+      <maven.compiler.target>17</maven.compiler.target>
+      <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+      <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+      <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+      <coverage.haltOnFailure>true</coverage.haltOnFailure>
+      <coverage.instructionCoveredRatioMinimum>0.75</coverage.instructionCoveredRatioMinimum>
+   </properties>
+
+   <dependencies>
+      <!-- qqq modules deps -->
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-backend-core</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-backend-module-rdbms</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-backend-module-api</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-backend-module-filesystem</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-middleware-javalin</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-middleware-picocli</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-language-support-javascript</artifactId>
+         <version>0.8.0-SNAPSHOT</version>
+      </dependency>
+
+      <!-- Other common 3rd party deps-->
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-simple</artifactId>
+         <version>1.8.0-beta4</version>
+      </dependency>
+      <dependency>
+         <groupId>org.liquibase</groupId>
+         <artifactId>liquibase-core</artifactId>
+         <version>4.10.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-checkstyle-plugin</artifactId>
+         <version>3.1.2</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.logging.log4j</groupId>
+         <artifactId>log4j-api</artifactId>
+         <version>2.15.0</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.logging.log4j</groupId>
+         <artifactId>log4j-core</artifactId>
+         <version>2.17.1</version>
+      </dependency>
+      <dependency>
+         <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter-engine</artifactId>
+         <version>5.8.1</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.assertj</groupId>
+         <artifactId>assertj-core</artifactId>
+         <version>3.23.1</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <!-- Assembly plugin, for building a CLI-->
+         <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+               <descriptorRefs>
+                  <descriptorRef>jar-with-dependencies</descriptorRef>
+               </descriptorRefs>
+               <archive>
+                  <manifest>
+                     <mainClass>com.kingsrook.qqq.starterapp.StarterAppCli</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+         <!-- Frontend plugin, for building typescript react ui from src into target js -->
+         <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>1.7.6</version>
+            <configuration>
+               <installDirectory>root</installDirectory>
+               <workingDirectory>src/main/ui</workingDirectory>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>install node and npm</id>
+                  <goals>
+                     <goal>install-node-and-npm</goal>
+                  </goals>
+                  <phase>${frontend.phase}</phase>
+                  <configuration>
+                     <nodeVersion>v16.15.0</nodeVersion>
+                     <npmVersion>8.5.5</npmVersion>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>npm install</id>
+                  <goals>
+                     <goal>npm</goal>
+                  </goals>
+                  <phase>${frontend.phase}</phase>
+                  <configuration>
+                     <arguments>install --legacy-peer-deps</arguments>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>prod build</id>
+                  <goals>
+                     <goal>npm</goal>
+                  </goals>
+                  <phase>${frontend.phase}</phase>
+                  <configuration>
+                     <arguments>run build</arguments>
+                     <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <!-- Shade plugin, for building a jar with all dependencies, to deploy javalin web server -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.1.1</version>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>shade</goal>
+                  </goals>
+                  <configuration>
+                     <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                           <mainClass>com.kingsrook.qqq.starterapp.StarterAppJavalinServer</mainClass>
+                        </transformer>
+                     </transformers>
+                  </configuration>
+               </execution>
+            </executions>
+            <configuration>
+               <filters>
+                  <filter>
+                     <artifact>*:*</artifact>
+                     <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                     </excludes>
+                  </filter>
+               </filters>
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+               <execution>
+                  <id>position-react-build</id>
+                  <goals>
+                     <goal>copy-resources</goal>
+                  </goals>
+                  <phase>generate-sources</phase>
+                  <configuration>
+                     <outputDirectory>${project.build.outputDirectory}/ui</outputDirectory>
+                     <resources>
+                        <resource>
+                           <directory>src/main/ui/build</directory>
+                           <filtering>false</filtering>
+                        </resource>
+                     </resources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <!-- Build an executable JAR -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.1.0</version>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                     <classpathPrefix>lib/</classpathPrefix>
+                     <mainClass>com.kingsrook.qqq.starterapp.StarterAppJavalinServer</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+
+         <!-- Common plugins for all qqq modules -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+            <configuration>
+               <compilerArgument>-Xlint:unchecked</compilerArgument>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M5</version>
+            <configuration>
+               <argLine>@{jaCoCoArgLine}</argLine>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.1.2</version>
+            <dependencies>
+               <dependency>
+                  <groupId>com.puppycrawl.tools</groupId>
+                  <artifactId>checkstyle</artifactId>
+                  <version>9.0</version>
+               </dependency>
+            </dependencies>
+            <executions>
+               <execution>
+                  <id>validate</id>
+                  <phase>validate</phase>
+                  <configuration>
+                     <configLocation>checkstyle/config.xml</configLocation>
+                     <headerLocation>checkstyle/license.txt</headerLocation>
+                     <encoding>UTF-8</encoding>
+                     <consoleOutput>true</consoleOutput>
+                     <failsOnError>false</failsOnError>
+                     <failOnViolation>${checkstyle.failOnViolation}</failOnViolation>
+                     <violationSeverity>warning</violationSeverity>
+                     <excludes>**/target/generated-sources/*.*</excludes>
+                  </configuration>
+                  <goals>
+                     <goal>check</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <version>4.10.0</version>
+            <configuration>
+               <propertyFile>/src/main/resources/liquibase/liquibase.properties</propertyFile>
+               <url>${env.RDBMS_URL}</url>
+               <username>${env.RDBMS_USERNAME}</username>
+               <password>${env.RDBMS_PASSWORD}</password>
+               <contexts>${env.LB_CONTEXTS}</contexts>
+            </configuration>
+         </plugin>
+
+         <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.8</version>
+            <configuration>
+               <includes>
+                  <include>com/nutrifresh/**/*</include>
+               </includes>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>pre-unit-test</id>
+                  <goals>
+                     <goal>prepare-agent</goal>
+                  </goals>
+                  <configuration>
+                     <propertyName>jaCoCoArgLine</propertyName>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>unit-test-check</id>
+                  <goals>
+                     <goal>check</goal>
+                  </goals>
+                  <configuration>
+                     <!-- Gives us the ability to pass a parameter to not fail due to coverage E.g. -Dcoverage.haltOnFailure=false -->
+                     <haltOnFailure>${coverage.haltOnFailure}</haltOnFailure>
+                     <rules>
+                        <rule>
+                           <element>BUNDLE</element>
+                           <limits>
+                              <limit>
+                                 <counter>INSTRUCTION</counter>
+                                 <value>COVEREDRATIO</value>
+                                 <minimum>${coverage.instructionCoveredRatioMinimum}</minimum>
+                              </limit>
+                           </limits>
+                        </rule>
+                     </rules>
+                  </configuration>
+               </execution>
+               <execution>
+                  <id>post-unit-test</id>
+                  <phase>verify</phase>
+                  <goals>
+                     <goal>report</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <artifactId>exec-maven-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <version>3.0.0</version>
+            <executions>
+               <execution>
+                  <id>test-coverage-summary</id>
+                  <phase>verify</phase>
+                  <goals>
+                     <goal>exec</goal>
+                  </goals>
+                  <configuration>
+                     <executable>sh</executable>
+                     <arguments>
+                        <argument>-c</argument>
+                        <argument>
+                           <![CDATA[
+echo "Element\nInstructions Missed\nInstruction Coverage\nBranches Missed\nBranch Coverage\nComplexity Missed\nComplexity Hit\nLines Missed\nLines Hit\nMethods Missed\nMethods Hit\nClasses Missed\nClasses Hit\n" > /tmp/$$.headers
+xpath -n -q -e '/html/body/table/tfoot/tr[1]/td/text()' target/site/jacoco/index.html > /tmp/$$.values
+echo
+echo "Jacoco coverage summary report:"
+echo "   See also target/site/jacoco/index.html"
+echo "   and https://www.jacoco.org/jacoco/trunk/doc/counters.html"
+echo "------------------------------------------------------------"
+paste /tmp/$$.headers /tmp/$$.values | tail +2 | awk -v FS='\t' '{printf("%-20s %s\n",$1,$2)}'
+rm /tmp/$$.headers /tmp/$$.values
+                           ]]>
+                        </argument>
+                     </arguments>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+      </plugins>
+   </build>
+
+   <repositories>
+      <repository>
+         <id>github-qqq-maven-registry</id>
+         <name>GitHub QQQ Maven Registry</name>
+         <url>https://maven.pkg.github.com/Kingsrook/qqq-maven-registry</url>
+      </repository>
+   </repositories>
+
+   <distributionManagement>
+      <repository>
+         <id>github-qqq-maven-registry</id>
+         <name>GitHub QQQ Maven Registry</name>
+         <url>https://maven.pkg.github.com/Kingsrook/qqq-maven-registry</url>
+      </repository>
+   </distributionManagement>
+
+</project>
