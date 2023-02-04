@@ -22,11 +22,11 @@
 package com.kingsrook.qqq.starterapp;
 
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import com.kingsrook.qqq.backend.core.exceptions.QInstanceValidationException;
 import com.kingsrook.qqq.backend.core.instances.QMetaDataVariableInterpreter;
+import com.kingsrook.qqq.backend.core.logging.QLogger;
 import com.kingsrook.qqq.backend.core.model.metadata.QInstance;
 import com.kingsrook.qqq.backend.core.model.session.QSession;
 import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleDispatcher;
@@ -35,14 +35,11 @@ import com.kingsrook.qqq.backend.core.scheduler.ScheduleManager;
 import com.kingsrook.qqq.backend.core.utils.ValueUtils;
 import com.kingsrook.qqq.backend.javalin.QJavalinImplementation;
 import io.javalin.Javalin;
-import io.javalin.http.staticfiles.Location;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 /*******************************************************************************
- ** Start a javalin http qqq server.
+ ** Start a javalin (http) qqq server.
  **
  ** Supported environment variables:
  **   SYSTEM_USER_OAUTH_TOKEN - for working with an auth0 authentication module,
@@ -50,11 +47,10 @@ import org.apache.logging.log4j.Logger;
  **
  ** Supported system properties:
  **   -Dqqq.scheduleManager.enabled=false - do not start the ScheduleManager (used inside that class)
- **   -Dqqq.javalinUiFolder.disabled=true - do not require (or use) the ui folder.
  *******************************************************************************/
 public class StarterAppJavalinServer
 {
-   private static final Logger LOG = LogManager.getLogger(StarterAppJavalinServer.class);
+   private static final QLogger LOG = QLogger.getLogger(StarterAppJavalinServer.class);
 
    private static final int PORT = 8000;
 
@@ -88,6 +84,7 @@ public class StarterAppJavalinServer
          QAuthenticationModuleInterface  authenticationModule            = qAuthenticationModuleDispatcher.getQModule(qInstance.getAuthentication());
          Map<String, String>             authenticationContext           = new HashMap<>();
 
+         // todo fix this
          String token = new QMetaDataVariableInterpreter().interpret("${env.SYSTEM_USER_OAUTH_TOKEN}");
          authenticationContext.put("sessionId", token);
 
@@ -95,7 +92,7 @@ public class StarterAppJavalinServer
       }
       catch(Exception e)
       {
-         LOG.error("Error creating system session", e);
+         // todo!! LOG.error("Error creating system session", e);
          return (null);
       }
    }
@@ -121,23 +118,17 @@ public class StarterAppJavalinServer
 
       Javalin service = Javalin.create(config ->
       {
-         ////////////////////////////////////////////////////
-         // allow server to startup without ui folder via: //
-         // -Dqqq.javalinUiFolder.disabled=true            //
-         ////////////////////////////////////////////////////
-         String propertyName  = "qqq.javalinUiFolder.disabled";
-         String propertyValue = System.getProperty(propertyName, "");
-         if(!propertyValue.equals("true"))
-         {
-            URL indexURL = getClass().getResource("/ui/index.html");
-            if(indexURL == null)
-            {
-               throw new IllegalStateException("Missing /ui/ artifacts.  Try:  mvn generate-sources -Dfrontend.phase=generate-sources");
-            }
+         ////////////////////////////////////////////////////////////////////////////////////////
+         // If you have any assets to add to the web server (e.g., logos, icons) place them at //
+         // src/main/resources/material-dashboard-overlay (or a directory of your choice       //
+         // under src/main/resources) and add them to the javalin config here.                 //
+         // Make sure to put app-specific directory first -- in case the same file exists in   //
+         // both (e.g., favicon.png), so the app-specific one will be returned.                //
+         ////////////////////////////////////////////////////////////////////////////////////////
+         // config.staticFiles.add("/material-dashboard-overlay");
 
-            config.staticFiles.add("/ui", Location.CLASSPATH);
-            config.spaRoot.addFile("/", "ui/index.html");
-         }
+         config.staticFiles.add("/material-dashboard");
+         config.spaRoot.addFile("/", "material-dashboard/index.html");
       }).start(port);
 
       service.routes(qJavalinImplementation.getRoutes());

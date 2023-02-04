@@ -31,8 +31,7 @@
 
    <properties>
       <!-- props specifically to this module -->
-      <!-- Try `mvn generate-sources -Dfrontend.phase=generate-sources' to only do the frontend packaging -->
-      <frontend.phase>prepare-package</frontend.phase>
+      <!-- none at this time -->
 
       <!-- Common props for all qqq modules -->
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -51,44 +50,54 @@
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-core</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195309-5</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-rdbms</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195317-5</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-api</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195317-5</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-filesystem</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195317-5</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-javalin</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195325-5</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-middleware-slack</artifactId>
+         <version>0.12.0-20230131.195333-5</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-picocli</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195325-5</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-language-support-javascript</artifactId>
-         <version>0.8.0-SNAPSHOT</version>
+         <version>0.12.0-20230131.195317-5</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-frontend-material-dashboard</artifactId>
+         <version>0.0.3-20230130.215307-1</version>
       </dependency>
 
       <!-- Other common 3rd party deps-->
       <dependency>
          <groupId>org.slf4j</groupId>
          <artifactId>slf4j-simple</artifactId>
-         <version>1.8.0-beta4</version>
+         <version>2.0.6</version>
       </dependency>
       <dependency>
          <groupId>org.liquibase</groupId>
@@ -140,50 +149,7 @@
                </archive>
             </configuration>
          </plugin>
-         <!-- Frontend plugin, for building typescript react ui from src into target js -->
-         <plugin>
-            <groupId>com.github.eirslett</groupId>
-            <artifactId>frontend-maven-plugin</artifactId>
-            <version>1.7.6</version>
-            <configuration>
-               <installDirectory>root</installDirectory>
-               <workingDirectory>src/main/ui</workingDirectory>
-            </configuration>
-            <executions>
-               <execution>
-                  <id>install node and npm</id>
-                  <goals>
-                     <goal>install-node-and-npm</goal>
-                  </goals>
-                  <phase>${frontend.phase}</phase>
-                  <configuration>
-                     <nodeVersion>v16.15.0</nodeVersion>
-                     <npmVersion>8.5.5</npmVersion>
-                  </configuration>
-               </execution>
-               <execution>
-                  <id>npm install</id>
-                  <goals>
-                     <goal>npm</goal>
-                  </goals>
-                  <phase>${frontend.phase}</phase>
-                  <configuration>
-                     <arguments>install --legacy-peer-deps</arguments>
-                  </configuration>
-               </execution>
-               <execution>
-                  <id>prod build</id>
-                  <goals>
-                     <goal>npm</goal>
-                  </goals>
-                  <phase>${frontend.phase}</phase>
-                  <configuration>
-                     <arguments>run build</arguments>
-                     <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
+
          <!-- Shade plugin, for building a jar with all dependencies, to deploy javalin web server -->
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -216,29 +182,6 @@
                   </filter>
                </filters>
             </configuration>
-         </plugin>
-
-         <plugin>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-               <execution>
-                  <id>position-react-build</id>
-                  <goals>
-                     <goal>copy-resources</goal>
-                  </goals>
-                  <phase>generate-sources</phase>
-                  <configuration>
-                     <outputDirectory>${project.build.outputDirectory}/ui</outputDirectory>
-                     <resources>
-                        <resource>
-                           <directory>src/main/ui/build</directory>
-                           <filtering>false</filtering>
-                        </resource>
-                     </resources>
-                  </configuration>
-               </execution>
-            </executions>
          </plugin>
 
          <plugin>

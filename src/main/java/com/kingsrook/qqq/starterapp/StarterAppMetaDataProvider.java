@@ -23,29 +23,29 @@ package com.kingsrook.qqq.starterapp;
 
 
 import com.kingsrook.qqq.backend.core.instances.QMetaDataVariableInterpreter;
+import com.kingsrook.qqq.backend.core.logging.QLogger;
 import com.kingsrook.qqq.backend.core.model.metadata.QAuthenticationType;
 import com.kingsrook.qqq.backend.core.model.metadata.QBackendMetaData;
 import com.kingsrook.qqq.backend.core.model.metadata.QInstance;
+import com.kingsrook.qqq.backend.core.model.metadata.authentication.QAuthenticationMetaData;
+import com.kingsrook.qqq.backend.core.model.metadata.branding.QBrandingMetaData;
 import com.kingsrook.qqq.backend.core.model.metadata.fields.QFieldMetaData;
 import com.kingsrook.qqq.backend.core.model.metadata.fields.QFieldType;
 import com.kingsrook.qqq.backend.core.model.metadata.layout.QAppMetaData;
 import com.kingsrook.qqq.backend.core.model.metadata.layout.QAppSection;
 import com.kingsrook.qqq.backend.core.model.metadata.layout.QIcon;
 import com.kingsrook.qqq.backend.core.model.metadata.tables.QTableMetaData;
-import com.kingsrook.qqq.backend.core.modules.authentication.metadata.QAuthenticationMetaData;
 import com.kingsrook.qqq.backend.core.utils.StringUtils;
 import com.kingsrook.qqq.backend.module.rdbms.model.metadata.RDBMSBackendMetaData;
 import com.kingsrook.qqq.backend.module.rdbms.model.metadata.RDBMSTableBackendDetails;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 /*******************************************************************************
- **
+ ** Define the qqq meta-data for your application
  *******************************************************************************/
 public class StarterAppMetaDataProvider
 {
-   private static final Logger LOG = LogManager.getLogger(StarterAppMetaDataProvider.class);
+   private static final QLogger LOG = QLogger.getLogger(StarterAppMetaDataProvider.class);
 
    public static final String RDBMS_BACKEND_NAME = "rdbmsBackend";
 
@@ -58,12 +58,26 @@ public class StarterAppMetaDataProvider
    {
       QInstance qInstance = new QInstance();
 
+      qInstance.setBranding(defineBranding());
       qInstance.setAuthentication(defineAuthentication());
       qInstance.addBackend(defineRDBMSBackend());
       qInstance.addTable(defineSampleTable());
       qInstance.addApp(defineSampleApp(qInstance));
 
       return (qInstance);
+   }
+
+
+
+   /*******************************************************************************
+    **
+    *******************************************************************************/
+   private static QBrandingMetaData defineBranding()
+   {
+      return new QBrandingMetaData()
+         .withIcon("my-icon.png")
+         .withLogo("my-logo.png")
+         .withCompanyName("Starter App");
    }
 
 
