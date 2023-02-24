@@ -52,7 +52,7 @@ here are the basic steps:
    ```
 2. Run the jar
    ```sh
-   java -jar target/
+   java -jar target/qqq-app-starter-0.1-SNAPSHOT.jar
    ```
 3. Access the dashboard at: http://localhost:8000/
    
