@@ -75,8 +75,8 @@ public class StarterAppMetaDataProvider
    private static QBrandingMetaData defineBranding()
    {
       return new QBrandingMetaData()
-         .withIcon("my-icon.png")
-         .withLogo("my-logo.png")
+         .withIcon("/sample-app-icon.png")
+         .withLogo("/sample-app-logo.png")
          .withCompanyName("Starter App");
    }
 
