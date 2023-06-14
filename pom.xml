@@ -50,47 +50,47 @@
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-core</artifactId>
-         <version>0.12.0-20230131.195309-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-rdbms</artifactId>
-         <version>0.12.0-20230131.195317-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-api</artifactId>
-         <version>0.12.0-20230131.195317-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-filesystem</artifactId>
-         <version>0.12.0-20230131.195317-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-javalin</artifactId>
-         <version>0.12.0-20230131.195325-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-slack</artifactId>
-         <version>0.12.0-20230131.195333-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-picocli</artifactId>
-         <version>0.12.0-20230131.195325-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-language-support-javascript</artifactId>
-         <version>0.12.0-20230131.195317-5</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-frontend-material-dashboard</artifactId>
-         <version>0.0.3-20230130.215307-1</version>
+         <version>0.15.0-SNAPSHOT</version>
       </dependency>
 
       <!-- Other common 3rd party deps-->
