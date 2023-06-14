@@ -47,6 +47,7 @@ import org.apache.commons.lang.BooleanUtils;
  **
  ** Supported system properties:
  **   -Dqqq.scheduleManager.enabled=false - do not start the ScheduleManager (used inside that class)
+ **   -Dqqq.javalin.hotSwapInstance=true - to cause the QInstance to be hot-swapped - useful during development, to avoid many server restarts
  *******************************************************************************/
 public class StarterAppJavalinServer
 {
@@ -74,32 +75,6 @@ public class StarterAppJavalinServer
 
 
    /*******************************************************************************
-    ** This function serves as the session-supplier for scheduled jobs.
-    *******************************************************************************/
-   public static QSession getSystemSession()
-   {
-      try
-      {
-         QAuthenticationModuleDispatcher qAuthenticationModuleDispatcher = new QAuthenticationModuleDispatcher();
-         QAuthenticationModuleInterface  authenticationModule            = qAuthenticationModuleDispatcher.getQModule(qInstance.getAuthentication());
-         Map<String, String>             authenticationContext           = new HashMap<>();
-
-         // todo fix this
-         String token = new QMetaDataVariableInterpreter().interpret("${env.SYSTEM_USER_OAUTH_TOKEN}");
-         authenticationContext.put("sessionId", token);
-
-         return (authenticationModule.createSession(qInstance, authenticationContext));
-      }
-      catch(Exception e)
-      {
-         // todo!! LOG.error("Error creating system session", e);
-         return (null);
-      }
-   }
-
-
-
-   /*******************************************************************************
     **
     *******************************************************************************/
    public StarterAppJavalinServer(QInstance qInstance)
@@ -121,27 +96,63 @@ public class StarterAppJavalinServer
          ////////////////////////////////////////////////////////////////////////////////////////
          // If you have any assets to add to the web server (e.g., logos, icons) place them at //
          // src/main/resources/material-dashboard-overlay (or a directory of your choice       //
-         // under src/main/resources) and add them to the javalin config here.                 //
-         // Make sure to put app-specific directory first -- in case the same file exists in   //
-         // both (e.g., favicon.png), so the app-specific one will be returned.                //
+         // under src/main/resources) and use this line of code to tell javalin about it.      //
+         // Make sure to add your app-specific directory to the javalin config before the core //
+         // material-dashboard directory, so in case the same file exists in both (e.g.,       //
+         // favicon.png), the app-specific one will be used.                                   //
          ////////////////////////////////////////////////////////////////////////////////////////
-         // config.staticFiles.add("/material-dashboard-overlay");
+         config.staticFiles.add("/material-dashboard-overlay");
 
+         /////////////////////////////////////////////////////////////////////
+         // tell javalin where to find material-dashboard static web assets //
+         /////////////////////////////////////////////////////////////////////
          config.staticFiles.add("/material-dashboard");
+
+         ////////////////////////////////////////////////////////////
+         // set the index page for the SPA from material dashboard //
+         ////////////////////////////////////////////////////////////
          config.spaRoot.addFile("/", "material-dashboard/index.html");
       }).start(port);
 
+      ///////////////////////////////////////////
+      // add qqq routes to the javalin service //
+      ///////////////////////////////////////////
       service.routes(qJavalinImplementation.getRoutes());
 
-      //////////////////////////////////////////////////////////////////////////////
-      // per env var, set the server to hot-swap the q instance before all routes //
-      //////////////////////////////////////////////////////////////////////////////
-      QMetaDataVariableInterpreter interpreter = new QMetaDataVariableInterpreter();
-      String                       hotSwap     = interpreter.interpret("${env.QQQ_HOT_SWAP_INSTANCE}");
-      if(BooleanUtils.isTrue(ValueUtils.getValueAsBoolean(hotSwap)))
+      //////////////////////////////////////////////////////////////////////////////////////
+      // per system property, set the server to hot-swap the q instance before all routes //
+      //////////////////////////////////////////////////////////////////////////////////////
+      String hotSwapPropertyValue = System.getProperty("qqq.javalin.hotSwapInstance", "false");
+      if(BooleanUtils.isTrue(ValueUtils.getValueAsBoolean(hotSwapPropertyValue)))
       {
          QJavalinImplementation.setQInstanceHotSwapSupplier(StarterAppMetaDataProvider::defineInstance);
          service.before(QJavalinImplementation::hotSwapQInstance);
+      }
+   }
+
+
+
+   /*******************************************************************************
+    ** This function serves as the session-supplier for scheduled jobs.
+    *******************************************************************************/
+   public static QSession getSystemSession()
+   {
+      try
+      {
+         QAuthenticationModuleDispatcher qAuthenticationModuleDispatcher = new QAuthenticationModuleDispatcher();
+         QAuthenticationModuleInterface  authenticationModule            = qAuthenticationModuleDispatcher.getQModule(qInstance.getAuthentication());
+         Map<String, String>             authenticationContext           = new HashMap<>();
+
+         // todo fix this
+         String token = new QMetaDataVariableInterpreter().interpret("${env.SYSTEM_USER_OAUTH_TOKEN}");
+         authenticationContext.put("sessionId", token);
+
+         return (authenticationModule.createSession(qInstance, authenticationContext));
+      }
+      catch(Exception e)
+      {
+         // todo!! LOG.error("Error creating system session", e);
+         return (null);
       }
    }
 
