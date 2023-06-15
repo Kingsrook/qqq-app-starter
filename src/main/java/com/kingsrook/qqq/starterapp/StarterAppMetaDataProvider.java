@@ -52,7 +52,8 @@ public class StarterAppMetaDataProvider
 
 
    /*******************************************************************************
-    **
+    ** top-level entry point method, which defines the QInstance, and places all
+    ** other meta-data objects inside it.
     *******************************************************************************/
    public static QInstance defineInstance()
    {
@@ -70,7 +71,7 @@ public class StarterAppMetaDataProvider
 
 
    /*******************************************************************************
-    **
+    ** define the branding meta-data for the app
     *******************************************************************************/
    private static QBrandingMetaData defineBranding()
    {
@@ -83,7 +84,7 @@ public class StarterAppMetaDataProvider
 
 
    /*******************************************************************************
-    **
+    ** define the authentication module meta-data for the app
     *******************************************************************************/
    private static QAuthenticationMetaData defineAuthentication()
    {
@@ -96,16 +97,24 @@ public class StarterAppMetaDataProvider
 
 
    /*******************************************************************************
-    **
+    ** define an RDBMS (database) backend for teh app
     *******************************************************************************/
    public static QBackendMetaData defineRDBMSBackend()
    {
+      //////////////////////////////////////////////////////////////////////////////////
+      // this object will parse ${env.XXX} strings and replace them with values       //
+      // from a .env file (in the working directory) - or - the process's environment //
+      //////////////////////////////////////////////////////////////////////////////////
       QMetaDataVariableInterpreter interpreter = new QMetaDataVariableInterpreter();
 
-      String vendor   = interpreter.interpret("${env.RDBMS_VENDOR}");
-      String hostname = interpreter.interpret("${env.RDBMS_HOSTNAME}");
+      String vendor       = interpreter.interpret("${env.RDBMS_VENDOR}");
+      String hostname     = interpreter.interpret("${env.RDBMS_HOSTNAME}");
+      String databaseName = interpreter.interpret("${env.RDBMS_DATABASE_NAME}");
 
-      if(!StringUtils.hasContent(vendor) || !StringUtils.hasContent(hostname))
+      ////////////////////////////////////////////////////////
+      // check that at least some of the basic vars are set //
+      ////////////////////////////////////////////////////////
+      if(!StringUtils.hasContent(vendor) || !StringUtils.hasContent(hostname) || !StringUtils.hasContent(databaseName))
       {
          throw new IllegalStateException("""
             Missing at least one env. var to define RDBMS backend meta data.
@@ -118,10 +127,9 @@ public class StarterAppMetaDataProvider
             RDBMS_PASSWORD""");
       }
 
-      Integer port         = Integer.valueOf(interpreter.interpret("${env.RDBMS_PORT}"));
-      String  databaseName = interpreter.interpret("${env.RDBMS_DATABASE_NAME}");
-      String  username     = interpreter.interpret("${env.RDBMS_USERNAME}");
-      String  password     = interpreter.interpret("${env.RDBMS_PASSWORD}");
+      Integer port     = Integer.valueOf(interpreter.interpret("${env.RDBMS_PORT}"));
+      String  username = interpreter.interpret("${env.RDBMS_USERNAME}");
+      String  password = interpreter.interpret("${env.RDBMS_PASSWORD}");
 
       return new RDBMSBackendMetaData()
          .withName(RDBMS_BACKEND_NAME)
@@ -136,18 +144,21 @@ public class StarterAppMetaDataProvider
 
 
    /*******************************************************************************
-    **
+    ** define meta-data for a table
     *******************************************************************************/
    public static QTableMetaData defineSampleTable()
    {
       return new QTableMetaData()
-         .withName("sample")
+         .withName("sampleTable")
          .withIcon(new QIcon().withName("star"))
          .withPrimaryKeyField("id")
          .withRecordLabelFormat("%s")
          .withRecordLabelFields("name")
          .withBackendName(RDBMS_BACKEND_NAME)
          .withBackendDetails(new RDBMSTableBackendDetails()
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // note - this is the table name within the RDBMS -- not the name that QQQ uses for the table. //
+            /////////////////////////////////////////////////////////////////////////////////////////////////
             .withTableName("sample"))
          .withField(new QFieldMetaData("id", QFieldType.INTEGER).withIsEditable(false))
          .withField(new QFieldMetaData("name", QFieldType.STRING));
@@ -156,7 +167,8 @@ public class StarterAppMetaDataProvider
 
 
    /*******************************************************************************
-    **
+    ** define meta-data for an app - that is - an object which shows up in the UI's
+    ** navigation, and which contains other objects (tables, processes).
     *******************************************************************************/
    private static QAppMetaData defineSampleApp(QInstance qInstance)
    {
