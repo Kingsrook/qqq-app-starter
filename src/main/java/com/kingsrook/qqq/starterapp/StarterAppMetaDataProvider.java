@@ -178,7 +178,7 @@ public class StarterAppMetaDataProvider
          .withSectionOfChildren(new QAppSection()
                .withName("sampleSection")
                .withIcon(new QIcon().withName("star")),
-            qInstance.getTable("sample"));
+            qInstance.getTable("sampleTable"));
    }
 
 }

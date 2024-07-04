@@ -42,56 +42,68 @@
       <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
       <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
       <coverage.haltOnFailure>true</coverage.haltOnFailure>
-      <coverage.instructionCoveredRatioMinimum>0.75</coverage.instructionCoveredRatioMinimum>
+      <coverage.instructionCoveredRatioMinimum>0.80</coverage.instructionCoveredRatioMinimum>
+
+      <qqq.versions.bom>0.20.0-20240628.152540-110</qqq.versions.bom>
+      <qqq.versions.frontendMaterialDashboard>0.20.0-20240625.185440-57</qqq.versions.frontendMaterialDashboard>
    </properties>
+
+   <dependencyManagement>
+      <dependencies>
+         <dependency>
+            <groupId>com.kingsrook.qqq</groupId>
+            <artifactId>qqq-bom-pom</artifactId>
+            <version>${qqq.versions.bom}</version>
+            <type>pom</type>
+            <scope>import</scope>
+         </dependency>
+      </dependencies>
+   </dependencyManagement>
 
    <dependencies>
       <!-- qqq modules deps -->
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-core</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-rdbms</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-api</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-backend-module-filesystem</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-javalin</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-slack</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+         <groupId>com.kingsrook.qqq</groupId>
+         <artifactId>qqq-middleware-api</artifactId>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-middleware-picocli</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-language-support-javascript</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
       </dependency>
       <dependency>
          <groupId>com.kingsrook.qqq</groupId>
          <artifactId>qqq-frontend-material-dashboard</artifactId>
-         <version>0.15.0-SNAPSHOT</version>
+         <version>${qqq.versions.frontendMaterialDashboard}</version>
       </dependency>
+
 
       <!-- Other common 3rd party deps-->
       <dependency>
@@ -112,12 +124,12 @@
       <dependency>
          <groupId>org.apache.logging.log4j</groupId>
          <artifactId>log4j-api</artifactId>
-         <version>2.15.0</version>
+         <version>2.23.0</version>
       </dependency>
       <dependency>
          <groupId>org.apache.logging.log4j</groupId>
          <artifactId>log4j-core</artifactId>
-         <version>2.17.1</version>
+         <version>2.23.0</version>
       </dependency>
       <dependency>
          <groupId>org.junit.jupiter</groupId>

@@ -24,6 +24,7 @@ package com.kingsrook.qqq.starterapp;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.kingsrook.qqq.backend.core.exceptions.QException;
 import com.kingsrook.qqq.backend.core.exceptions.QInstanceValidationException;
 import com.kingsrook.qqq.backend.core.instances.QMetaDataVariableInterpreter;
 import com.kingsrook.qqq.backend.core.logging.QLogger;
@@ -31,7 +32,7 @@ import com.kingsrook.qqq.backend.core.model.metadata.QInstance;
 import com.kingsrook.qqq.backend.core.model.session.QSession;
 import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleDispatcher;
 import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleInterface;
-import com.kingsrook.qqq.backend.core.scheduler.ScheduleManager;
+import com.kingsrook.qqq.backend.core.scheduler.QScheduleManager;
 import com.kingsrook.qqq.backend.core.utils.ValueUtils;
 import com.kingsrook.qqq.backend.javalin.QJavalinImplementation;
 import io.javalin.Javalin;
@@ -62,13 +63,12 @@ public class StarterAppJavalinServer
    /*******************************************************************************
     **
     *******************************************************************************/
-   public static void main(String[] args) throws QInstanceValidationException
+   public static void main(String[] args) throws QException
    {
       QInstance qInstance = StarterAppMetaDataProvider.defineInstance();
       new StarterAppJavalinServer(qInstance).startJavalinServer(PORT);
 
-      ScheduleManager scheduleManager = ScheduleManager.getInstance(qInstance);
-      scheduleManager.setSessionSupplier(StarterAppJavalinServer::getSystemSession);
+      QScheduleManager scheduleManager = QScheduleManager.initInstance(qInstance, StarterAppJavalinServer::getSystemSession);
       scheduleManager.start();
    }
 
