@@ -8,17 +8,36 @@ a QQQ application.
     * Maven (tested with 3.8.6)
     * Git
 * Maven settings:
-    * In your `~/.m2/settings.xml`, define the `github-qqq-maven-registry` server, to get
-    access to the qqq maven registry:
-    ```xml
-       <servers>
-          <server>
-             <id>github-qqq-maven-registry</id>
-             <username>**REDACTED**</username>
-             <password>**REDACTED**</password>
-          </server>
-       </servers>
-    ```
+  * You will need a github token in your `~/.m2/settings.xml` file, to get 
+  the QQQ jars through maven. 
+  There are 2 options for generating such a token in github:
+    1. github > your photo > Settings > Developer Settings > Personal access 
+    tokens > Tokens (classic) > Generate new token > Generate new token 
+    (classic) > give it a note, expiration date, and critically, choose the 
+    read:packages checkbox.
+    2. github > your photo > Settings > Developer Settings > Personal access
+    tokens > Fine-grained Tokens > Generate new token > give it a name, 
+    expiration date, and critically, choose the "All repositories" option 
+    under "Repository access"
+  * After you have your token, then make sure you have a `servers` section 
+  that looks like the one in following example in your `~/.m2/settings.xml` 
+  file (if you don't have that file at all yet, you can create the whole 
+  file as shown):
+
+```
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+   <servers>
+      <server>
+         <id>github-qqq-maven-registry</id>
+         <username>YOUR-GITHUB-USERNAME</username>
+         <password>YOUR-GITHUB-TOKEN</password>
+      </server>
+   </servers>
+</settings>
+```
+
 * Database:
     * This starter app is going to try to connect to a MySQL database.  You will specify
       the database's name, hostname, port, etc, in a `.env` file.  The only assumption
@@ -37,7 +56,7 @@ a QQQ application.
    ~git:] cd my-first-qqq-project
    ~git/my-first-qqq-project:] unzip qqq-app-starter.zip
    ~git/my-first-qqq-project:] ## or:
-   ~git/my-first-qqq-project:] git clone url://of/this/repo
+   ~git/my-first-qqq-project:] git clone git@github.com:Kingsrook/qqq-app-starter.git
    ```
 2. Write .env file with settings for a MySQL that you want to connect to:
    ```properties
@@ -48,7 +67,7 @@ a QQQ application.
    RDBMS_USERNAME=<your rdbms username>
    RDBMS_PASSWORD=<your rdbms password>
    
-   QQQ_ENV_MATERIAL_UI_LICENSE_KEY=<A license key for MaterialUI.  Without this data grids will show a watermark.>
+   QQQ_ENV_MATERIAL_UI_LICENSE_KEY=<Optionally, a license key for MaterialUI.  Without this data grids will show a watermark.>
    ```
 
 ## In IntelliJ
