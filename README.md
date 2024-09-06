@@ -10,7 +10,8 @@ a QQQ application.
 * Maven settings:
   * You will need a github token in your `~/.m2/settings.xml` file, to get 
   the QQQ jars through maven. 
-  There are 2 options for generating such a token in github:
+  There are 2 options for generating such a token in github, as [documented by
+    github](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
     1. github > your photo > Settings > Developer Settings > Personal access 
     tokens > Tokens (classic) > Generate new token > Generate new token 
     (classic) > give it a note, expiration date, and critically, choose the 
@@ -90,6 +91,14 @@ To open your new project in IntelliJ, as if you actually wanted to work on it:
 4. Access your new qqq application at: http://localhost:8000/
    * You should then be able to click on your table and see its query-screen; then view
    individual records, and/or add or edit records.
+
+## Common Pitfalls
+* HTTP 401 error from maven.
+  * Probably means your github token wasn't created correctly, or not set correctly
+    in your maven settings file.
+* NullPointerException within defineSampleApp method
+  * If you changed your table's name in defineSampleTable, make sure you've also changed
+    the reference to it in defineSampleApp...
 
 ## Next Steps?
 * Branding?
