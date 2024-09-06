@@ -5,7 +5,7 @@ a QQQ application.
 ## Prerequisites
 * Required software:
     * Java 17+
-    * Maven (tested with 3.8.6)
+    * Maven (tested between 3.8.6 and 3.9.7)
     * Git
 * Maven settings:
   * You will need a github token in your `~/.m2/settings.xml` file, to get 
@@ -40,25 +40,33 @@ a QQQ application.
 
 * Database:
     * This starter app is going to try to connect to a MySQL database.  You will specify
-      the database's name, hostname, port, etc, in a `.env` file.  The only assumption
-      or requirement for the database, is that it have a table named `sample`, with
-      an `id INTEGER AUTO_INCREMENT PRIMARY KEY` column, and a `name VARCHAR(100)` column.
-        * If you don't have (or want to have) such a table, you can edit the method
-        `defineSampleTable` in `StarterAppMetaDataProvider.java`, to specify a different
-        sample table name and/or columns.
+      the database's name, hostname, port, etc, in a `.env` file.
+    * You will then tell QQQ details about the first table in this database that you want
+      to use, in the method `defineSampleTable` in `StarterAppMetaDataProvider.java`.
 
 ## First Steps
 1. Clone this repo / expand this archive into a new directory where you want to set up your project.
-   * For example:
+   * For example, to start from a clone of this repo:
+   ```sh
+   ~:] cd ~/git/
+   ~git/my-first-qqq-project:] git clone git@github.com:Kingsrook/qqq-app-starter.git my-first-qqq-project
+   ```
+   * Or, if you got this file as a zip...
    ```sh
    ~:] cd ~/git/
    ~git:] mkdir my-first-qqq-project
    ~git:] cd my-first-qqq-project
    ~git/my-first-qqq-project:] unzip qqq-app-starter.zip
-   ~git/my-first-qqq-project:] ## or:
-   ~git/my-first-qqq-project:] git clone git@github.com:Kingsrook/qqq-app-starter.git
    ```
-2. Write .env file with settings for a MySQL that you want to connect to:
+
+2. (optional) Update the `groupId` and `artifactId` in the `pom.xml`, to identify the project as your own:
+   ```xml
+   <groupId>com.yourdomain</groupId>
+   <artifactId>my-first-qqq-project</artifactId>
+   <version>0.1-SNAPSHOT</version>
+   ```
+
+3. Write .env file with settings for a MySQL that you want to connect to:
    ```properties
    RDBMS_VENDOR=mysql
    RDBMS_HOSTNAME=<your rdbms hostname>
@@ -66,15 +74,28 @@ a QQQ application.
    RDBMS_DATABASE_NAME=<your rdbms database name>
    RDBMS_USERNAME=<your rdbms username>
    RDBMS_PASSWORD=<your rdbms password>
-   
+
    QQQ_ENV_MATERIAL_UI_LICENSE_KEY=<Optionally, a license key for MaterialUI.  Without this data grids will show a watermark.>
    ```
 
 ## In IntelliJ
 To open your new project in IntelliJ, as if you actually wanted to work on it:
-1. Create a new project from existing sources, opening this project's `pom.xml` file.
-2. Open `StarterAppJavalinServer.java`, and Run or Debug it.  
-3. Access the dashboard at: http://localhost:8000/
+1. Create a new project from existing sources, selecting this project's `pom.xml` file.
+2. As mentioned above, you'll probalby need to edit the `defineSampleTable` method in
+   `StarterAppMetaDataProvider.java`, to fill in some details about your first table.
+3. Open `StarterAppJavalinServer.java`, and Run or Debug it.
+   * You'll know it's started successfully if you see a line referencing http://localhost 
+   scroll by.
+   * If there any exceptions, read them and try to debug.
+4. Access your new qqq application at: http://localhost:8000/
+   * You should then be able to click on your table and see its query-screen; then view
+   individual records, and/or add or edit records.
+
+## Next Steps?
+* Branding?
+* More tables?
+* Possible Values (drop-downs for fields that reference another table or enum)?
+* Authentication??? nah, we're not ready for that :)
 
 ## Project Structure
 ### Java Class overview
