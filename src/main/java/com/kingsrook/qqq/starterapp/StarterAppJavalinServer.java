@@ -24,12 +24,16 @@ package com.kingsrook.qqq.starterapp;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.kingsrook.qqq.backend.core.context.QContext;
 import com.kingsrook.qqq.backend.core.exceptions.QException;
 import com.kingsrook.qqq.backend.core.exceptions.QInstanceValidationException;
 import com.kingsrook.qqq.backend.core.instances.QMetaDataVariableInterpreter;
+import com.kingsrook.qqq.backend.core.logging.QCollectingLogger;
 import com.kingsrook.qqq.backend.core.logging.QLogger;
 import com.kingsrook.qqq.backend.core.model.metadata.QInstance;
 import com.kingsrook.qqq.backend.core.model.session.QSession;
+import com.kingsrook.qqq.backend.core.model.session.QSystemUserSession;
+import com.kingsrook.qqq.backend.core.model.session.QUser;
 import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleDispatcher;
 import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleInterface;
 import com.kingsrook.qqq.backend.core.scheduler.QScheduleManager;
@@ -41,10 +45,6 @@ import org.apache.commons.lang.BooleanUtils;
 
 /*******************************************************************************
  ** Start a javalin (http) qqq server.
- **
- ** Supported environment variables:
- **   SYSTEM_USER_OAUTH_TOKEN - for working with an auth0 authentication module,
- **      this value is the bearer token used for system-sessions (e.g., scheduled jobs)
  **
  ** Supported system properties:
  **   -Dqqq.scheduleManager.enabled=false - do not start the ScheduleManager (used inside that class)
@@ -68,6 +68,7 @@ public class StarterAppJavalinServer
       QInstance qInstance = StarterAppMetaDataProvider.defineInstance();
       new StarterAppJavalinServer(qInstance).startJavalinServer(PORT);
 
+      QContext.setQInstance(qInstance);
       QScheduleManager scheduleManager = QScheduleManager.initInstance(qInstance, StarterAppJavalinServer::getSystemSession);
       scheduleManager.start();
    }
@@ -137,23 +138,10 @@ public class StarterAppJavalinServer
     *******************************************************************************/
    public static QSession getSystemSession()
    {
-      try
-      {
-         QAuthenticationModuleDispatcher qAuthenticationModuleDispatcher = new QAuthenticationModuleDispatcher();
-         QAuthenticationModuleInterface  authenticationModule            = qAuthenticationModuleDispatcher.getQModule(qInstance.getAuthentication());
-         Map<String, String>             authenticationContext           = new HashMap<>();
-
-         // todo fix this
-         String token = new QMetaDataVariableInterpreter().interpret("${env.SYSTEM_USER_OAUTH_TOKEN}");
-         authenticationContext.put("sessionId", token);
-
-         return (authenticationModule.createSession(qInstance, authenticationContext));
-      }
-      catch(Exception e)
-      {
-         // todo!! LOG.error("Error creating system session", e);
-         return (null);
-      }
+      return new QSystemUserSession()
+         .withUser(new QUser()
+            .withFullName("System User")
+            .withIdReference("system-user"));
    }
 
 }
