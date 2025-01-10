@@ -44,8 +44,8 @@
       <coverage.haltOnFailure>true</coverage.haltOnFailure>
       <coverage.instructionCoveredRatioMinimum>0.80</coverage.instructionCoveredRatioMinimum>
 
-      <qqq.versions.bom>0.20.0-20240628.152540-110</qqq.versions.bom>
-      <qqq.versions.frontendMaterialDashboard>0.20.0-20240625.185440-57</qqq.versions.frontendMaterialDashboard>
+      <qqq.versions.bom>0.24.0-20250106-145452</qqq.versions.bom>
+      <qqq.versions.frontendMaterialDashboard>0.24.0-20241122.223138-1</qqq.versions.frontendMaterialDashboard>
    </properties>
 
    <dependencyManagement>
