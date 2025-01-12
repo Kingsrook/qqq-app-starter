@@ -22,41 +22,27 @@
 package com.kingsrook.qqq.starterapp;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import com.kingsrook.qqq.backend.core.context.QContext;
 import com.kingsrook.qqq.backend.core.exceptions.QException;
-import com.kingsrook.qqq.backend.core.exceptions.QInstanceValidationException;
-import com.kingsrook.qqq.backend.core.instances.QMetaDataVariableInterpreter;
-import com.kingsrook.qqq.backend.core.logging.QCollectingLogger;
 import com.kingsrook.qqq.backend.core.logging.QLogger;
-import com.kingsrook.qqq.backend.core.model.metadata.QInstance;
-import com.kingsrook.qqq.backend.core.model.session.QSession;
 import com.kingsrook.qqq.backend.core.model.session.QSystemUserSession;
-import com.kingsrook.qqq.backend.core.model.session.QUser;
-import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleDispatcher;
-import com.kingsrook.qqq.backend.core.modules.authentication.QAuthenticationModuleInterface;
 import com.kingsrook.qqq.backend.core.scheduler.QScheduleManager;
-import com.kingsrook.qqq.backend.core.utils.ValueUtils;
-import com.kingsrook.qqq.backend.javalin.QJavalinImplementation;
-import io.javalin.Javalin;
-import org.apache.commons.lang.BooleanUtils;
+import com.kingsrook.qqq.middleware.javalin.QApplicationJavalinServer;
 
 
 /*******************************************************************************
  ** Start a javalin (http) qqq server.
  **
  ** Supported system properties:
- **   -Dqqq.scheduleManager.enabled=false - do not start the ScheduleManager (used inside that class)
- **   -Dqqq.javalin.hotSwapInstance=true - to cause the QInstance to be hot-swapped - useful during development, to avoid many server restarts
+ **
+ ** -Dqqq.scheduleManager.enabled=false - do not start the ScheduleManager
+ **   (used inside that class).
+ **
+ ** -Dqqq.javalin.hotSwapInstance=true - to cause the QInstance to be hot-swapped.
+ **   Useful during development, to avoid needing as many server restarts.
  *******************************************************************************/
 public class StarterAppJavalinServer
 {
    private static final QLogger LOG = QLogger.getLogger(StarterAppJavalinServer.class);
-
-   private static final int PORT = 8000;
-
-   private static QInstance qInstance;
 
 
 
@@ -65,83 +51,29 @@ public class StarterAppJavalinServer
     *******************************************************************************/
    public static void main(String[] args) throws QException
    {
-      QInstance qInstance = StarterAppMetaDataProvider.defineInstance();
-      new StarterAppJavalinServer(qInstance).startJavalinServer(PORT);
-
-      QContext.setQInstance(qInstance);
-      QScheduleManager scheduleManager = QScheduleManager.initInstance(qInstance, StarterAppJavalinServer::getSystemSession);
-      scheduleManager.start();
-   }
-
-
-
-   /*******************************************************************************
-    **
-    *******************************************************************************/
-   public StarterAppJavalinServer(QInstance qInstance)
-   {
-      StarterAppJavalinServer.qInstance = qInstance;
-   }
-
-
-
-   /*******************************************************************************
-    **
-    *******************************************************************************/
-   public void startJavalinServer(int port) throws QInstanceValidationException
-   {
-      QJavalinImplementation qJavalinImplementation = new QJavalinImplementation(qInstance);
-
-      Javalin service = Javalin.create(config ->
+      try
       {
-         ////////////////////////////////////////////////////////////////////////////////////////
-         // If you have any assets to add to the web server (e.g., logos, icons) place them at //
-         // src/main/resources/material-dashboard-overlay (or a directory of your choice       //
-         // under src/main/resources) and use this line of code to tell javalin about it.      //
-         // Make sure to add your app-specific directory to the javalin config before the core //
-         // material-dashboard directory, so in case the same file exists in both (e.g.,       //
-         // favicon.png), the app-specific one will be used.                                   //
-         ////////////////////////////////////////////////////////////////////////////////////////
-         config.staticFiles.add("/material-dashboard-overlay");
+         /////////////////////////////
+         // define your application //
+         /////////////////////////////
+         StarterAppMetaDataProvider application = new StarterAppMetaDataProvider();
 
-         /////////////////////////////////////////////////////////////////////
-         // tell javalin where to find material-dashboard static web assets //
-         /////////////////////////////////////////////////////////////////////
-         config.staticFiles.add("/material-dashboard");
+         /////////////////////////////////////
+         // start the javalin (http) server //
+         /////////////////////////////////////
+         QApplicationJavalinServer javalinServer = new QApplicationJavalinServer(application);
+         javalinServer.start();
 
-         ////////////////////////////////////////////////////////////
-         // set the index page for the SPA from material dashboard //
-         ////////////////////////////////////////////////////////////
-         config.spaRoot.addFile("/", "material-dashboard/index.html");
-      }).start(port);
-
-      ///////////////////////////////////////////
-      // add qqq routes to the javalin service //
-      ///////////////////////////////////////////
-      service.routes(qJavalinImplementation.getRoutes());
-
-      //////////////////////////////////////////////////////////////////////////////////////
-      // per system property, set the server to hot-swap the q instance before all routes //
-      //////////////////////////////////////////////////////////////////////////////////////
-      String hotSwapPropertyValue = System.getProperty("qqq.javalin.hotSwapInstance", "false");
-      if(BooleanUtils.isTrue(ValueUtils.getValueAsBoolean(hotSwapPropertyValue)))
-      {
-         QJavalinImplementation.setQInstanceHotSwapSupplier(StarterAppMetaDataProvider::defineInstance);
-         service.before(QJavalinImplementation::hotSwapQInstance);
+         //////////////////////////////////////////////////////////////////////////
+         // if you want to use scheduled jobs, start the schedule manager module //
+         //////////////////////////////////////////////////////////////////////////
+         QScheduleManager scheduleManager = QScheduleManager.initInstance(application.defineQInstance(), () -> new QSystemUserSession());
+         scheduleManager.start();
       }
-   }
-
-
-
-   /*******************************************************************************
-    ** This function serves as the session-supplier for scheduled jobs.
-    *******************************************************************************/
-   public static QSession getSystemSession()
-   {
-      return new QSystemUserSession()
-         .withUser(new QUser()
-            .withFullName("System User")
-            .withIdReference("system-user"));
+      catch(Exception e)
+      {
+         LOG.error("Error starting application server.", e);
+      }
    }
 
 }

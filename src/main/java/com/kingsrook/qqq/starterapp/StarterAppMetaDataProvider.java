@@ -22,6 +22,8 @@
 package com.kingsrook.qqq.starterapp;
 
 
+import com.kingsrook.qqq.backend.core.exceptions.QException;
+import com.kingsrook.qqq.backend.core.instances.AbstractQQQApplication;
 import com.kingsrook.qqq.backend.core.instances.QMetaDataVariableInterpreter;
 import com.kingsrook.qqq.backend.core.logging.QLogger;
 import com.kingsrook.qqq.backend.core.model.metadata.QAuthenticationType;
@@ -40,10 +42,11 @@ import com.kingsrook.qqq.backend.module.rdbms.model.metadata.RDBMSBackendMetaDat
 import com.kingsrook.qqq.backend.module.rdbms.model.metadata.RDBMSTableBackendDetails;
 
 
+
 /*******************************************************************************
  ** Define the qqq meta-data for your application
  *******************************************************************************/
-public class StarterAppMetaDataProvider
+public class StarterAppMetaDataProvider extends AbstractQQQApplication
 {
    private static final QLogger LOG = QLogger.getLogger(StarterAppMetaDataProvider.class);
 
@@ -51,11 +54,12 @@ public class StarterAppMetaDataProvider
 
 
 
-   /*******************************************************************************
+   /***************************************************************************
     ** top-level entry point method, which defines the QInstance, and places all
     ** other meta-data objects inside it.
-    *******************************************************************************/
-   public static QInstance defineInstance()
+    ***************************************************************************/
+   @Override
+   public QInstance defineQInstance() throws QException
    {
       QInstance qInstance = new QInstance();
 
@@ -78,7 +82,8 @@ public class StarterAppMetaDataProvider
       return new QBrandingMetaData()
          .withIcon("/sample-app-icon.png")
          .withLogo("/sample-app-logo.png")
-         .withCompanyName("Starter App");
+         .withAppName("Starter App")
+         .withCompanyName("Kingsrook");
    }
 
 
@@ -180,5 +185,4 @@ public class StarterAppMetaDataProvider
                .withIcon(new QIcon().withName("star")),
             qInstance.getTable("sampleTable"));
    }
-
 }
